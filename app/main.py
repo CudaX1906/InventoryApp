@@ -3,8 +3,8 @@ from app.api import auth, users, products, cart, orders
 from app.db import models
 from app.db.database import engine
 
-# Create database tables (using SQLAlchemy models)
-models.Base.metadata.create_all(bind=engine)
+
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="E-Commerce Order and Inventory API")
 

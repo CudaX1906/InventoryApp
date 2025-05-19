@@ -22,14 +22,12 @@ def create_order(db: Session = Depends(get_db), current_user = Depends(get_curre
     print(cart.items)
     if not cart or not cart.items:
         raise HTTPException(status_code=400, detail="Cart is empty")
-    # Check stock availability
     
     for item in cart.items:
         print(item)
         product = db.query(Product).filter(Product.id == item.product_id).first()
         if item.quantity > product.stock:
             raise HTTPException(status_code=400, detail=f"Insufficient stock for {product.name}")
-    # Create order and adjust stock
     total_amount = 0
     order = Order(user_id=current_user.id, status="PENDING", total=0)
     db.add(order)
@@ -41,12 +39,12 @@ def create_order(db: Session = Depends(get_db), current_user = Depends(get_curre
                                quantity=item.quantity, price=product.price)
         total_amount += product.price * item.quantity
         db.add(order_item)
-        db.delete(item)  # remove from cart
+        db.delete(item)  
     order.total = total_amount
     db.commit()
     db.refresh(order)
-    # Mock payment processing
-    success = random.choice([True, True, True, False])  # 75% chance success
+    
+    success = random.choice([True, True, True, False]) 
     payment_log = PaymentLog(order_id=order.id, success=success)
     order.status = "PAID" if success else "FAILED"
     db.add(payment_log)

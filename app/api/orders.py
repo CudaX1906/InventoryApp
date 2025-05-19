@@ -33,7 +33,8 @@ def create_order(db: Session = Depends(get_db), current_user = Depends(get_curre
     db.add(order)
     db.flush()  # get order.id
     for item in cart.items:
-        product = db.query(Product).filter(Product.id == item.product_id).first()
+        product = db.query(Product).with_for_update().filter(Product.id == item.product_id).first()
+
         product.stock -= item.quantity
         order_item = OrderItem(order_id=order.id, product_id=item.product_id,
                                quantity=item.quantity, price=product.price)
